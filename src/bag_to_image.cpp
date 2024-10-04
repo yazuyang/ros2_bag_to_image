@@ -98,9 +98,13 @@ void BagToImage::ReadBag() {
         target_topic_name = target_topic_name.substr(1);
       }
       target_topic_name = std::regex_replace(target_topic_name, std::regex("/"), "_");
+      // nanosecをゼロパディングする
+      std::ostringstream nanosec_stream;
+      nanosec_stream << std::setw(9) << std::setfill('0') << image_msg->header.stamp.nanosec;
+      
       fname = output_path_ + "/" + target_topic_name + "_" +
               boost::lexical_cast<std::string>(image_msg->header.stamp.sec) + "." +
-              boost::lexical_cast<std::string>(image_msg->header.stamp.nanosec) + ".png";
+              nanosec_stream.str() + ".png";
 
       cv::imwrite(fname, image_msg->image);
       RCLCPP_INFO_STREAM(get_logger(), "Image saved to: " << fname);
